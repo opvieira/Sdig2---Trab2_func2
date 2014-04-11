@@ -1,0 +1,154 @@
+.include<m128def.inc>
+.def star=r22
+.def contar=r21
+.cseg					// define o inicio do segmento de codigo
+.org 0x00					// inicia o segmento de codigo na posição 0
+jmp main
+
+.org 0x02
+				// inicia o segmento de codigo na posição 0
+jmp int_int0
+
+.org 0x04					// inicia o segmento de codigo na posição 0
+jmp int_int1
+
+.org 0x001E
+jmp int_tc0
+
+
+.org 0x46				// inicia o segmento de codigo na posição 0x46
+
+inicio:
+	ldi r23,0x01
+	ldi r16, 0b11000000    	//PORTD - SWITCHES (entradas)
+	out PORTD, r16
+	out DDRD, r16
+							// PORTA - LEDS (saidas) inicia o led8 ligado, estrelas
+	ldi r16, 0b01111111
+	out PORTA, r16
+	ser r16
+	out DDRA, r16
+
+							// PORTC - Segmentos Displays, saida
+	ser r16
+	out DDRC, r16
+	ldi star, 1
+	ldi r16, 0xF9
+	out PORTC, r16
+
+						// Configurar interrupções
+	ldi r16, 0x80
+	out SREG, r16
+
+	ldi r16, 0x0A
+	sts EICRA, r16
+
+	ldi r16, 0x03
+	out EIMSK, r16
+	sei
+	ldi r16, 0x0F
+	out TCCR0, r16
+
+	ldi r16, 0x4D		//77
+	out OCR0, r16
+
+	ldi r16, 0x02
+	out TIMSK, r16
+
+	ldi contar, 0
+	ret
+
+
+main:
+	ldi r16, low (RAMEND)
+	out SPL, r16
+
+	ldi r16, high (RAMEND)
+	out SPH, r16
+	call inicio
+
+
+ciclo:
+	jmp ciclo
+
+int_int0:      	// sw1
+	ldi contar, 1
+	reti
+
+int_int1:		// sw2
+	ldi contar, 0
+	ser r16
+	out PORTA, r16
+	reti
+
+
+int_tc0:
+	cpi contar, 1
+	brne f_int
+	ldi r16, 0b01111111
+	out PORTA, r16
+	inc star
+	call display1
+	reti
+
+f_int:
+	reti
+
+display1:
+	cpi star, 1
+	brne display2
+	ldi r16, 0xF9
+	out PORTC, r16
+	ret
+display2:
+	cpi star, 2
+	brne display3
+	ldi r16, 0xA4
+	out PORTC, r16
+	ret
+display3:
+	cpi star, 3
+	brne display4
+	ldi r16, 0xB0
+	out PORTC, r16
+	ret
+display4:
+	cpi star, 4
+	brne display5
+	ldi r16, 0x99
+	out PORTC, r16
+	ret
+
+display5:
+	cpi star, 5
+	brne display6
+	ldi r16, 0x92
+	out PORTC, r16
+	ret
+display6:
+	cpi star, 6
+	brne display7
+	ldi r16, 0x82
+	out PORTC, r16
+    ret
+display7:
+	cpi star, 7
+	brne display8
+	ldi r16, 0xF8
+	out PORTC, r16
+	ret
+
+display8:
+	cpi star, 8
+	brne display9
+	ldi r16, 0x80
+	out PORTC, r16
+	ret
+
+display9:
+	cpi star, 9
+	brne display1
+	ldi r16, 0x90
+	out PORTC, r16
+	ldi star, 0
+	ret
