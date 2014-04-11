@@ -1,16 +1,25 @@
 .include<m128def.inc>
 .def star=r22
 .def contar=r21
+.def alg=r23
+.def unid=r24
+.def dez=25
+
 .cseg					// define o inicio do segmento de codigo
-.org 0x00					// inicia o segmento de codigo na posição 0
+.org 0x00				// inicia o segmento de codigo na posição 0x00
 jmp main
 
-.org 0x02
-				// inicia o segmento de codigo na posição 0
-jmp int_int0
+.org 0x02				// inicia o segmento de codigo na posição 0x02
+jmp int_int0				// sw1 - activa estrelas
 
-.org 0x04					// inicia o segmento de codigo na posição 0
-jmp int_int1
+.org 0x04				// inicia o segmento de codigo na posição 0x04
+jmp int_int1				// sw2 - para estrelas
+
+.org 0x06				// inicia o segmento de codigo na posição 0x06
+jmp int_int2				// sw3 - activa numeros
+
+.org 0x08				// inicia o segmento de codigo na posição 0x08
+jmp int_int3				// sw4 - para numeros
 
 .org 0x001E
 jmp int_tc0
